@@ -1,0 +1,645 @@
+<UserControl x:Class="OrderManager.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:OrderManager.Converters">
+    <UserControl.Resources>
+        <conv:TextToVisibilityConverter x:Key="TextToVis" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <!-- 背景来源单选：胶囊按钮，选中用品牌浅底 -->
+        <Style x:Key="SourceRadio" TargetType="RadioButton">
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+            <Setter Property="FontSize" Value="{StaticResource FontSizeMd}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Padding" Value="16,0" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="bd"
+                                Background="{DynamicResource BgInput}"
+                                BorderBrush="{DynamicResource BorderInput}"
+                                BorderThickness="1"
+                                CornerRadius="9"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Brand}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource BrandSoft}" />
+                                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource Brand}" />
+                                <Setter Property="Foreground" Value="{StaticResource BrandDark}" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 壁纸列表项：白底圆角卡片，hover 浅灰、选中品牌浅底（不用系统蓝底选中样式） -->
+        <Style x:Key="WallpaperItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Margin" Value="0,0,10,10" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Shell"
+                                Background="{DynamicResource BgCard}"
+                                BorderBrush="{DynamicResource BorderSoft}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Stretch" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Shell" Property="Background" Value="{DynamicResource BgHover}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Shell" Property="Background" Value="{DynamicResource BgSelected}" />
+                                <Setter TargetName="Shell" Property="BorderBrush" Value="{StaticResource Brand}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- 页头 -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="设置" Style="{StaticResource H1}" />
+            <TextBlock Text="店铺信息、分成规则与数据备份都在这里"
+                       Style="{StaticResource Subtle}"
+                       Margin="0,6,0,0" />
+        </StackPanel>
+
+        <!-- 操作提示条 -->
+        <Border Grid.Row="1"
+                Padding="14,10"
+                Margin="0,0,0,14"
+                Background="{DynamicResource BrandSoft}"
+                CornerRadius="{StaticResource RadiusMd}"
+                Visibility="{Binding StatusText, Converter={StaticResource TextToVis}}">
+            <TextBlock Text="{Binding StatusText}"
+                       Style="{StaticResource TextBase}"
+                       Foreground="{StaticResource BrandDark}"
+                       TextWrapping="Wrap" />
+        </Border>
+
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+
+                <!-- 店铺信息 -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="店铺信息" Style="{StaticResource H2}" />
+                        <TextBlock Text="会在主界面与导出的订单中显示"
+                                   Style="{StaticResource Subtle}"
+                                   Margin="0,6,0,0" />
+                        <WrapPanel Margin="0,16,0,0">
+                            <StackPanel Width="220" Margin="0,0,16,0">
+                                <TextBlock Text="店铺名称" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding ShopName, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Width="220" Margin="0,0,16,0">
+                                <TextBlock Text="店主称呼" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding OwnerName, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <Button Content="保存店铺信息"
+                                    Style="{StaticResource BtnPrimary}"
+                                    VerticalAlignment="Bottom"
+                                    Margin="0,0,0,0"
+                                    Command="{Binding SaveProfileCommand}" />
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 分成规则 -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="分成规则" Style="{StaticResource H2}" />
+                        <TextBlock Text="比例按百分数填写，例如 20 表示 20%；保存后各页面金额立即按新规则重算"
+                                   Style="{StaticResource Subtle}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,0,0" />
+                        <WrapPanel Margin="0,16,0,0">
+                            <StackPanel Width="200" Margin="0,0,16,14">
+                                <TextBlock Text="新规则生效日期" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding NewRulesStartDate, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Width="200" Margin="0,0,16,14">
+                                <TextBlock Text="高额订单门槛（元）" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding HighThreshold, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Width="200" Margin="0,0,16,14">
+                                <TextBlock Text="高额订单旧规则（%）" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding HighRateOld, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Width="200" Margin="0,0,16,14">
+                                <TextBlock Text="高额订单新规则（%）" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding HighRateNew, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Width="200" Margin="0,0,16,14">
+                                <TextBlock Text="低额订单旧规则（%）" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding LowRateOld, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Width="200" Margin="0,0,16,14">
+                                <TextBlock Text="低额订单新规则（%）" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding LowRateNew, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Width="200" Margin="0,0,16,14">
+                                <TextBlock Text="助手分成（%）" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding RunnerAssistantRate, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Width="200" Margin="0,0,16,14">
+                                <TextBlock Text="小予单助手分成（%）" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding XiaoyuRate, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Width="200" Margin="0,0,16,14">
+                                <TextBlock Text="跑手默认分成（%）" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding RunnerRate, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Width="200" Margin="0,0,16,14">
+                                <TextBlock Text="我的分成（%）" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding MyRate, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Width="200" Margin="0,0,16,14">
+                                <TextBlock Text="小予的称呼" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <TextBox Style="{StaticResource Input}"
+                                         Text="{Binding XiaoyuName, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </WrapPanel>
+
+                        <CheckBox Style="{StaticResource Check}"
+                                  Content="停用助手分成（助手不参与分成）"
+                                  IsChecked="{Binding DisableAssistantShare}"
+                                  Margin="0,4,0,0" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                            <Button Content="保存规则"
+                                    Style="{StaticResource BtnPrimary}"
+                                    Command="{Binding SaveRulesCommand}" />
+                            <Button Content="恢复默认"
+                                    Style="{StaticResource BtnSecondary}"
+                                    Margin="10,0,0,0"
+                                    Command="{Binding ResetRulesCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 外观 -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="外观" Style="{StaticResource H2}" />
+                        <TextBlock Text="给窗口换一张背景图，并调整蒙层与模糊；改动立即生效，无需再点保存"
+                                   Style="{StaticResource Subtle}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,0,0" />
+
+                        <StackPanel Visibility="{Binding IsImageSource, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="背景图" Style="{StaticResource Muted}" Margin="0,16,0,6" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0"
+                                        Padding="12,0"
+                                        Height="36"
+                                        Background="{DynamicResource BgInput}"
+                                        BorderBrush="{DynamicResource BorderSoft}"
+                                        BorderThickness="1"
+                                        CornerRadius="{StaticResource RadiusMd}"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding BackgroundImageText}"
+                                               Style="{StaticResource TextBase}"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
+                                </Border>
+                                <Button Grid.Column="1"
+                                        Content="选择图片"
+                                        Style="{StaticResource BtnSecondary}"
+                                        Margin="10,0,0,0"
+                                        Command="{Binding SelectBackgroundCommand}" />
+                                <Button Grid.Column="2"
+                                        Content="清除背景"
+                                        Style="{StaticResource BtnDanger}"
+                                        Margin="10,0,0,0"
+                                        IsEnabled="{Binding HasBackground}"
+                                        Command="{Binding ClearBackgroundCommand}" />
+                            </Grid>
+                            <TextBlock Text="图片会复制到 data\images 目录，换电脑时跟着数据一起走"
+                                       Style="{StaticResource Muted}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,8,0,0" />
+                        </StackPanel>
+
+                        <Border Height="1"
+                                Background="{DynamicResource BorderSoft}"
+                                Margin="0,18,0,0" />
+
+                        <!-- 遮罩浓度 -->
+                        <TextBlock Text="遮罩浓度" Style="{StaticResource Muted}" Margin="0,18,0,6" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Slider Grid.Column="0"
+                                    Minimum="0"
+                                    Maximum="100"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    MinHeight="24"
+                                    VerticalAlignment="Center"
+                                    Value="{Binding OverlayOpacity, Mode=TwoWay}" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding OverlayOpacityText}"
+                                       Style="{StaticResource TextBase}"
+                                       Foreground="{DynamicResource TextSecondary}"
+                                       Width="56"
+                                       TextAlignment="Right"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                        <TextBlock Text="数值越大，背景图越淡、文字越清楚"
+                                   Style="{StaticResource Muted}"
+                                   Margin="0,6,0,0" />
+
+                        <WrapPanel Margin="0,16,0,0">
+                            <StackPanel Width="260" Margin="0,0,16,0">
+                                <TextBlock Text="图片铺法" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <ComboBox Style="{StaticResource Combo}"
+                                          ItemsSource="{Binding StretchOptions}"
+                                          DisplayMemberPath="Label"
+                                          SelectedItem="{Binding SelectedStretchOption, Mode=TwoWay}" />
+                            </StackPanel>
+                            <StackPanel Width="260" Margin="0,0,16,0">
+                                <TextBlock Text="模糊程度" Style="{StaticResource Muted}" Margin="0,0,0,6" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Grid.Column="0"
+                                            Minimum="0"
+                                            Maximum="30"
+                                            TickFrequency="1"
+                                            IsSnapToTickEnabled="True"
+                                            MinHeight="24"
+                                            Margin="0,6,0,0"
+                                            VerticalAlignment="Center"
+                                            Value="{Binding BlurRadius, Mode=TwoWay}" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding BlurRadiusText}"
+                                               Style="{StaticResource TextBase}"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               Width="40"
+                                               TextAlignment="Right"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                                <!-- 视频壁纸直接用视频画面，模糊对它不生效 -->
+                                <TextBlock Text="视频壁纸不支持模糊"
+                                           Style="{StaticResource Muted}"
+                                           Margin="0,6,0,0"
+                                           Visibility="{Binding IsVideoWallpaper, Converter={StaticResource BoolToVis}}" />
+                            </StackPanel>
+                        </WrapPanel>
+
+                        <!-- 通透模式：卡片近乎透明，只留文字和轮廓，让壁纸整块透出来 -->
+                        <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                            <CheckBox Content="通透模式（只留文字与组件轮廓）"
+                                      Style="{StaticResource Check}"
+                                      IsChecked="{Binding GlassMode, Mode=TwoWay}"
+                                      VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Text="开启后卡片、侧栏、输入框和表格分隔线都变成半透明白，壁纸整块透出来，文字和 1px 轮廓保持不变。"
+                                   Style="{StaticResource Muted}"
+                                   Margin="0,6,0,0"
+                                   TextWrapping="Wrap" />
+
+                        <!-- 动态壁纸（实验）：按帧渲染，粒子/图层动画会动起来 -->
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <CheckBox Content="动态壁纸（实验）"
+                                      Style="{StaticResource Check}"
+                                      IsChecked="{Binding LiveWallpaper, Mode=TwoWay}"
+                                      VerticalAlignment="Center" />
+                            <TextBlock Text="清晰度" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="18,0,8,0"
+                                       Visibility="{Binding LiveWallpaper, Converter={StaticResource BoolToVis}}" />
+                            <ComboBox Width="170" Style="{StaticResource Combo}" Height="32"
+                                      ItemsSource="{Binding LiveQualityOptions}"
+                                      SelectedItem="{Binding SelectedLiveQuality, Mode=TwoWay}"
+                                      Visibility="{Binding LiveWallpaper, Converter={StaticResource BoolToVis}}" />
+                        </StackPanel>
+                        <TextBlock Text="开启后场景类壁纸会在后台逐帧渲染，粒子与图层会动起来；更吃 CPU，也会比静态图略软一点。"
+                                   Style="{StaticResource Muted}"
+                                   Margin="0,6,0,0"
+                                   TextWrapping="Wrap" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                            <Button Content="恢复默认外观"
+                                    Style="{StaticResource BtnSecondary}"
+                                    Command="{Binding ResetAppearanceCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 壁纸（Wallpaper Engine） -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="壁纸（Wallpaper Engine）" Style="{StaticResource H2}" />
+                        <TextBlock Text="Wallpaper Engine 没有公开的账号订阅接口，这里直接读取本机已订阅的创意工坊壁纸"
+                                   Style="{StaticResource Subtle}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,0,0" />
+                        <TextBlock Text="{Binding WeStatusText}"
+                                   Style="{StaticResource Muted}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,10,0,0" />
+
+                        <!-- 背景来源：静态图片 / 订阅壁纸 -->
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <RadioButton Content="使用静态图片"
+                                         GroupName="WallpaperSource"
+                                         Style="{StaticResource SourceRadio}"
+                                         IsChecked="{Binding IsImageSource, Mode=TwoWay}" />
+                            <RadioButton Content="使用订阅壁纸"
+                                         GroupName="WallpaperSource"
+                                         Style="{StaticResource SourceRadio}"
+                                         IsChecked="{Binding IsWallpaperEngineSource, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <CheckBox Style="{StaticResource Check}"
+                                  Content="跟随 Wallpaper Engine 当前壁纸"
+                                  IsChecked="{Binding WeFollowCurrent, Mode=TwoWay}"
+                                  Margin="0,14,0,0" />
+                        <TextBlock Text="{Binding WeFollowHint}"
+                                   Style="{StaticResource Muted}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,0,0"
+                                   Visibility="{Binding WeFollowHint, Converter={StaticResource TextToVis}}" />
+
+                        <Border Height="1"
+                                Background="{DynamicResource BorderSoft}"
+                                Margin="0,18,0,0" />
+
+                        <!-- 搜索 + 重新扫描 -->
+                        <Grid Margin="0,16,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <TextBox Style="{StaticResource Input}"
+                                         Height="36"
+                                         Text="{Binding WallpaperSearch, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="搜索壁纸标题或类型"
+                                           Style="{StaticResource Muted}"
+                                           Margin="12,0,0,0"
+                                           VerticalAlignment="Center"
+                                           IsHitTestVisible="False"
+                                           Visibility="{Binding WallpaperSearch, Converter={StaticResource TextToVis}, ConverterParameter=invert}" />
+                            </Grid>
+                            <Button Grid.Column="1"
+                                    Content="重新扫描"
+                                    Style="{StaticResource BtnSecondary}"
+                                    Margin="10,0,0,0"
+                                    Command="{Binding RescanWallpapersCommand}" />
+                        </Grid>
+
+                        <!-- 订阅壁纸列表：缩略图卡片，选中即生效 -->
+                        <Grid Height="300" Margin="0,12,0,0">
+                            <ListBox ItemsSource="{Binding WallpapersView}"
+                                     SelectedItem="{Binding SelectedWallpaper, Mode=TwoWay}"
+                                     SelectionMode="Single"
+                                     ItemContainerStyle="{StaticResource WallpaperItemStyle}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     Padding="0"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     ScrollViewer.CanContentScroll="False">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="3" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <Border Height="124"
+                                                    Background="{DynamicResource BgInput}"
+                                                    CornerRadius="8"
+                                                    ClipToBounds="True">
+                                                <Grid>
+                                                    <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" />
+                                                    <Border HorizontalAlignment="Right"
+                                                            VerticalAlignment="Top"
+                                                            Margin="6"
+                                                            Padding="6,2"
+                                                            CornerRadius="6"
+                                                            Background="#B31F2A37"
+                                                            Visibility="{Binding HasVideo, Converter={StaticResource BoolToVis}}">
+                                                        <TextBlock Text="视频"
+                                                                   FontSize="{StaticResource FontSizeXs}"
+                                                                   Foreground="White" />
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                            <Grid Margin="2,8,2,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding Title}"
+                                                           Style="{StaticResource TextBase}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           ToolTip="{Binding Title}" />
+                                                <Border Grid.Column="1"
+                                                        Margin="8,0,0,0"
+                                                        Padding="6,1"
+                                                        Background="{DynamicResource BrandSoft}"
+                                                        CornerRadius="6"
+                                                        VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding KindText}"
+                                                               Style="{StaticResource Muted}"
+                                                               Foreground="{StaticResource BrandDark}" />
+                                                </Border>
+                                            </Grid>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <!-- 空列表提示 -->
+                            <StackPanel HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        IsHitTestVisible="False"
+                                        Visibility="{Binding HasNoWallpapers, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="{Binding EmptyWallpaperText}"
+                                           Style="{StaticResource Subtle}"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 快捷键 -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="快捷键" Style="{StaticResource H2}" />
+                        <TextBlock Text="在窗口任意页面按下即可使用"
+                                   Style="{StaticResource Subtle}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,0,0" />
+                        <ItemsControl ItemsSource="{Binding ShortcutItems}" Margin="0,10,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0"
+                                                HorizontalAlignment="Left"
+                                                Padding="10,4"
+                                                Background="{DynamicResource BgInput}"
+                                                BorderBrush="{DynamicResource BorderSoft}"
+                                                BorderThickness="1"
+                                                CornerRadius="{StaticResource RadiusSm}">
+                                            <TextBlock Text="{Binding Key}"
+                                                       Style="{StaticResource TextBase}"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextPrimary}" />
+                                        </Border>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Description}"
+                                                   Style="{StaticResource Subtle}"
+                                                   VerticalAlignment="Center"
+                                                   TextWrapping="Wrap"
+                                                   Margin="12,0,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- 启动 -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="启动" Style="{StaticResource H2}" />
+                        <TextBlock Text="让代肝管家随 Windows 一起打开，开机就能直接记单"
+                                   Style="{StaticResource Subtle}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,0,0" />
+                        <CheckBox Content="开机自动启动"
+                                  Style="{StaticResource Check}"
+                                  IsChecked="{Binding AutoStart, Mode=TwoWay}"
+                                  Margin="0,14,0,0" />
+                        <TextBlock Text="会自动挑一种系统允许的方式注册（注册表启动项 / 启动文件夹 / 计划任务），不需要管理员权限；想关掉时把勾去掉即可。"
+                                   Style="{StaticResource Muted}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,10,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- 数据与备份 -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,4">
+                    <StackPanel>
+                        <TextBlock Text="数据与备份" Style="{StaticResource H2}" />
+                        <TextBlock Text="所有数据保存在本机，不会上传网络；建议定期备份数据库"
+                                   Style="{StaticResource Subtle}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,0,0" />
+
+                        <TextBlock Text="数据目录" Style="{StaticResource Muted}" Margin="0,16,0,6" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0"
+                                    Padding="12,0"
+                                    Height="36"
+                                    Background="{DynamicResource BgInput}"
+                                    BorderBrush="{DynamicResource BorderInput}"
+                                    BorderThickness="1"
+                                    CornerRadius="{StaticResource RadiusMd}"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="{Binding DataDir}"
+                                           Style="{StaticResource TextBase}"
+                                           Foreground="{DynamicResource TextSecondary}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" />
+                            </Border>
+                            <Button Grid.Column="1"
+                                    Content="打开文件夹"
+                                    Style="{StaticResource BtnSecondary}"
+                                    Margin="10,0,0,0"
+                                    Command="{Binding OpenDataFolderCommand}" />
+                        </Grid>
+
+                        <TextBlock Text="{Binding DbPathText}"
+                                   Style="{StaticResource Muted}"
+                                   TextTrimming="CharacterEllipsis"
+                                   Margin="0,8,0,0" />
+
+                        <Border Height="1"
+                                Background="{DynamicResource BorderSoft}"
+                                Margin="0,18,0,0" />
+
+                        <WrapPanel Margin="0,18,0,0">
+                            <Button Content="备份数据库"
+                                    Style="{StaticResource BtnPrimary}"
+                                    Command="{Binding BackupDatabaseCommand}" />
+                            <Button Content="导出全部订单"
+                                    Style="{StaticResource BtnSecondary}"
+                                    Margin="10,0,0,0"
+                                    Command="{Binding ExportOrdersCommand}" />
+                        </WrapPanel>
+                        <TextBlock Text="备份会把数据库复制到桌面并带上时间戳；导出的订单为 CSV 文件，可用 Excel 打开。"
+                                   Style="{StaticResource Muted}"
+                                   TextWrapping="Wrap"
+                                   LineHeight="20"
+                                   Margin="0,14,0,0" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
+

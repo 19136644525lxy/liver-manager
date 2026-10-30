@@ -1,0 +1,6 @@
+{
+  "BackgroundPath": "F:\\订单管理\\src\\OrderManager\\bin\\Debug\\net10.0-windows\\data\\images\\background-test.jpg",
+  "OverlayOpacity": 62,
+  "Stretch": "UniformToFill",
+  "BlurRadius": 10
+}

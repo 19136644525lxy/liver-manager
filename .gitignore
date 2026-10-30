@@ -1,0 +1,28 @@
+# 构建产物
+bin/
+obj/
+*.user
+.vs/
+
+# 发布目录（本地 dotnet publish 生成，不入库）
+/发布/
+/发布-*/
+
+# 运行期缓存 / 截图 / 日志
+/shots/
+_cache/
+_out/
+_ref/
+frames/
+*.log
+错误日志.txt
+
+# 本地数据（订单库、导入记录、壁纸缓存都属于用户数据，不入库）
+data/
+**/data/
+*.db
+*.db-shm
+*.db-wal
+
+# 旧工具分析残留
+tools/dsh-we/
